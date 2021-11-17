@@ -5,15 +5,15 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/categories")
-class CategoryController(val categoryService: CategoryService) {
+class CategoryController(val categoryCRUDService: CategoryCRUDService) {
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping
-    fun post(@RequestBody category: CategoryModel): CategoryModel = categoryService.post(category)
+    fun post(@RequestBody category: Category): Category = categoryCRUDService.post(category)
 
     @GetMapping
-    fun getAll(): List<CategoryModel> = categoryService.findAll()
+    fun getAll(): List<Category> = categoryCRUDService.findAll()
 
     @GetMapping("/{categoryId}")
-    fun getOne(@PathVariable("categoryId") categoryId: Int): CategoryModel = categoryService.findOne(categoryId)
+    fun getOne(@PathVariable("categoryId") categoryId: Long): Category = categoryCRUDService.findOne(categoryId)
 }
