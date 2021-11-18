@@ -1,5 +1,6 @@
 package com.housebills.categories
 
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import com.housebills.sub.categories.SubCategory
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -17,12 +18,12 @@ class Category(
     @Column(unique = true)
     val name: String = ""
 ) {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "category", cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY)
-    private val _subCategories = mutableListOf<SubCategory>()
-
-    val subCategories get() = _subCategories
+    val subCategories = mutableListOf<SubCategory>()
 }

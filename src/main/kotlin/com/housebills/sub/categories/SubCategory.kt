@@ -1,5 +1,6 @@
 package com.housebills.sub.categories
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import com.housebills.categories.Category
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -18,6 +19,7 @@ class SubCategory(
     @Column(unique = true)
     val name: String = "",
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)], optional = false)
     @JoinColumn(name = "category_id")
     val category: Category? = null

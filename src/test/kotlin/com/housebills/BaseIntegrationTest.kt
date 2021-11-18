@@ -9,3 +9,4 @@ import org.springframework.boot.test.context.SpringBootTest
 @TestMethodOrder(OrderAnnotation::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class BaseIntegrationTest
+// TODO: Add an after all to cleanup the DB
