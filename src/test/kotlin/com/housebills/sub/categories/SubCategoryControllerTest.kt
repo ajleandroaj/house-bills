@@ -9,17 +9,19 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.test.web.client.exchange
 import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 
 internal class SubCategoryControllerTest(@Autowired val restTemplate: TestRestTemplate) : BaseIntegrationTest() {
     val BASE_PATH = "/sub-categories"
 
-    private fun createCategory(): Unit {
+    private fun createCategory() {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         restTemplate.postForEntity<CategoryOutDto>("/categories", HttpEntity("""{"name": "Revenue"}""", headers))
@@ -42,6 +44,34 @@ internal class SubCategoryControllerTest(@Autowired val restTemplate: TestRestTe
     @Order(1)
     fun `Get one element and receive a not found`() {
         val entity = restTemplate.getForEntity<String>("$BASE_PATH/1")
+        Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    @Order(1)
+    fun `Update one element and receive a not found`() {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val entity = restTemplate.exchange<String>(
+            "$BASE_PATH/1",
+            HttpMethod.PUT,
+            HttpEntity("""{"name": "Saves"}""", headers)
+        )
+        Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    @Order(1)
+    fun `Delete one element and receive a not found`() {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val entity = restTemplate.exchange<String>(
+            "$BASE_PATH/1",
+            HttpMethod.DELETE,
+            HttpEntity(null, headers)
+        )
         Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
 
@@ -85,10 +115,14 @@ internal class SubCategoryControllerTest(@Autowired val restTemplate: TestRestTe
     @Test
     @Order(4)
     fun `Get all elements and receive the previous two inserted elements`() {
-        val entity = restTemplate.getForEntity<String>(BASE_PATH)
+        val entity = restTemplate.getForEntity<Array<SubCategoryOutDto>>(BASE_PATH)
         Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
-        // TODO: Add a converter from SubCategoryOutDto to JSON here
-        Assertions.assertThat(entity.body).isEqualTo("""[{"id":1,"name":"Market"},{"id":2,"name":"Light"}]""")
+        Assertions.assertThat(entity.body).isEqualTo(
+            arrayOf(
+                SubCategoryOutDto(1, "Market"),
+                SubCategoryOutDto(2, "Light")
+            )
+        )
     }
 
     @Test
@@ -97,5 +131,37 @@ internal class SubCategoryControllerTest(@Autowired val restTemplate: TestRestTe
         val entity = restTemplate.getForEntity<SubCategoryOutDto>("$BASE_PATH/1")
         Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
         Assertions.assertThat(entity.body).isEqualTo(SubCategoryOutDto(1, "Market"))
+    }
+
+    @Test
+    @Order(5)
+    fun `Update one element`() {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val entity = restTemplate.exchange<SubCategoryOutDto>(
+            "$BASE_PATH/1",
+            HttpMethod.PUT,
+            HttpEntity("""{"name": "Saves"}""", headers)
+        )
+        Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
+        Assertions.assertThat(entity.body).isEqualTo(SubCategoryOutDto(1, "Saves"))
+    }
+
+    @Test
+    @Order(6)
+    fun `Delete one element`() {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val entity = restTemplate.exchange<String>(
+            "$BASE_PATH/1",
+            HttpMethod.DELETE,
+            HttpEntity(null, headers)
+        )
+        Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
+
+        val entityNotFound = restTemplate.getForEntity<String>("$BASE_PATH/1")
+        Assertions.assertThat(entityNotFound.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
 }

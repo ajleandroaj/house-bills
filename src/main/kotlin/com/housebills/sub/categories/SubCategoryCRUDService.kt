@@ -4,6 +4,7 @@ import com.housebills.categories.CategoryRepository
 import com.housebills.categories.exceptions.CategoryNotFoundException
 import com.housebills.sub.categories.dtos.CreateSubCategoryInDto
 import com.housebills.sub.categories.dtos.SubCategoryOutDto
+import com.housebills.sub.categories.dtos.UpdateSubCategoryInDto
 import com.housebills.sub.categories.exceptions.SubCategoryNotFoundException
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -15,7 +16,7 @@ class SubCategoryCRUDService(
 ) {
 
     @Transactional
-    fun post(createSubCategoryInDto: CreateSubCategoryInDto): SubCategoryOutDto {
+    fun createOne(createSubCategoryInDto: CreateSubCategoryInDto): SubCategoryOutDto {
         val category =
             categoryRepository.findById(createSubCategoryInDto.categoryId)
                 .orElseThrow { CategoryNotFoundException() }
@@ -26,16 +27,35 @@ class SubCategoryCRUDService(
         return SubCategoryOutDto(subCategory.id, subCategory.name)
     }
 
-    fun findAll(): List<SubCategoryOutDto> =
+    fun readAll(): List<SubCategoryOutDto> =
         subCategoryRepository.findAll()
             .toList()
             .map { SubCategoryOutDto(it.id, it.name) }
 
-    fun findOne(subCategoryId: Long): SubCategoryOutDto {
+    fun readOne(subCategoryId: Long): SubCategoryOutDto {
         val subCategory = subCategoryRepository
             .findById(subCategoryId)
             .orElseThrow { SubCategoryNotFoundException() }
 
         return SubCategoryOutDto(subCategory.id, subCategory.name)
+    }
+
+    fun updateOne(subCategoryId: Long, updateSubCategoryInDto: UpdateSubCategoryInDto): SubCategoryOutDto {
+        var subCategory = subCategoryRepository
+            .findById(subCategoryId)
+            .orElseThrow { SubCategoryNotFoundException() }
+
+        subCategory.name = updateSubCategoryInDto.name
+        subCategory = subCategoryRepository.save(subCategory)
+
+        return SubCategoryOutDto(subCategory.id, subCategory.name)
+    }
+
+    fun deleteOne(subCategoryId: Long) {
+        val subCategory = subCategoryRepository
+            .findById(subCategoryId)
+            .orElseThrow { CategoryNotFoundException() }
+
+        subCategoryRepository.delete(subCategory)
     }
 }

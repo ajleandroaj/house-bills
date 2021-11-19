@@ -25,7 +25,7 @@ class CategoryController(val categoryCRUDService: CategoryCRUDService) {
     fun updateOne(
         @PathVariable("categoryId") categoryId: Long,
         @RequestBody updateCategoryInDto: UpdateCategoryInDto
-    ): CategoryOutDto = categoryCRUDService.update(categoryId, updateCategoryInDto)
+    ): CategoryOutDto = categoryCRUDService.updateOne(categoryId, updateCategoryInDto)
 
     @DeleteMapping("/{categoryId}")
     fun deleteOne(@PathVariable("categoryId") categoryId: Long): Unit = categoryCRUDService.deleteOne(categoryId)

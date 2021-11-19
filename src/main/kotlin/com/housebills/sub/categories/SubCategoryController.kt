@@ -2,6 +2,7 @@ package com.housebills.sub.categories
 
 import com.housebills.sub.categories.dtos.CreateSubCategoryInDto
 import com.housebills.sub.categories.dtos.SubCategoryOutDto
+import com.housebills.sub.categories.dtos.UpdateSubCategoryInDto
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
@@ -11,13 +12,24 @@ class SubCategoryController(val subCategoryCRUDService: SubCategoryCRUDService) 
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping
-    fun post(@RequestBody subCategory: CreateSubCategoryInDto): SubCategoryOutDto =
-        subCategoryCRUDService.post(subCategory)
+    fun createOne(@RequestBody subCategory: CreateSubCategoryInDto): SubCategoryOutDto =
+        subCategoryCRUDService.createOne(subCategory)
 
     @GetMapping
-    fun getAll(): List<SubCategoryOutDto> = subCategoryCRUDService.findAll()
+    fun readAll(): List<SubCategoryOutDto> = subCategoryCRUDService.readAll()
 
     @GetMapping("/{subCategoryId}")
-    fun getOne(@PathVariable("subCategoryId") subCategoryId: Long): SubCategoryOutDto =
-        subCategoryCRUDService.findOne(subCategoryId)
+    fun readOne(@PathVariable("subCategoryId") subCategoryId: Long): SubCategoryOutDto =
+        subCategoryCRUDService.readOne(subCategoryId)
+
+    @PutMapping("/{subCategoryId}")
+    fun updateOne(
+        @PathVariable("subCategoryId") subCategoryId: Long,
+        @RequestBody updateSubCategoryInDto: UpdateSubCategoryInDto
+    ): SubCategoryOutDto = subCategoryCRUDService.updateOne(subCategoryId, updateSubCategoryInDto)
+
+    @DeleteMapping("/{subCategoryId}")
+    fun deleteOne(@PathVariable("subCategoryId") subCategoryId: Long): Unit =
+        subCategoryCRUDService.deleteOne(subCategoryId)
+
 }

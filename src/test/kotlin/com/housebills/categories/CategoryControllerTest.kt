@@ -83,10 +83,14 @@ internal class CategoryControllerTest(@Autowired val restTemplate: TestRestTempl
     @Test
     @Order(3)
     fun `Get all elements and receive the previous two inserted elements`() {
-        val entity = restTemplate.getForEntity<String>(BASE_PATH)
+        val entity = restTemplate.getForEntity<Array<CategoryOutDto>>(BASE_PATH)
         assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
-        // TODO: Add a converter from CategoryOutDto to JSON here
-        assertThat(entity.body).isEqualTo("""[{"id":1,"name":"Revenue"},{"id":2,"name":"Expense"}]""")
+        assertThat(entity.body).isEqualTo(
+            arrayOf(
+                CategoryOutDto(1, "Revenue"),
+                CategoryOutDto(2, "Expense")
+            )
+        )
     }
 
     @Test

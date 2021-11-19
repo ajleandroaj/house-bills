@@ -17,7 +17,7 @@ import javax.persistence.Table
 @Table(name = "sub_categories")
 class SubCategory(
     @Column(unique = true)
-    val name: String = "",
+    var name: String = "",
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)], optional = false)

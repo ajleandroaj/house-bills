@@ -28,7 +28,7 @@ class CategoryCRUDService(val categoryRepository: CategoryRepository) {
         return CategoryOutDto(category.id, category.name)
     }
 
-    fun update(categoryId: Long, updateCategoryInDto: UpdateCategoryInDto): CategoryOutDto {
+    fun updateOne(categoryId: Long, updateCategoryInDto: UpdateCategoryInDto): CategoryOutDto {
         var category = categoryRepository
             .findById(categoryId)
             .orElseThrow { CategoryNotFoundException() }
