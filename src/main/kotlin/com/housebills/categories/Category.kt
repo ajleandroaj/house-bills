@@ -16,12 +16,12 @@ import javax.persistence.Table
 @Table(name = "categories")
 class Category(
     @Column(unique = true)
-    val name: String = ""
+    var name: String = ""
 ) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long = 0
+    val id: Long = 0
 
     @JsonManagedReference
     @OneToMany(mappedBy = "category", cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY)
