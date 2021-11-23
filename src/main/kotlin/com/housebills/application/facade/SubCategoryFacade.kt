@@ -1,12 +1,12 @@
 package com.housebills.application.facade
 
-import com.housebills.domain.exception.category.CategoryNotFoundException
 import com.housebills.application.dto.sub.category.CreateSubCategoryInDto
 import com.housebills.application.dto.sub.category.SubCategoryOutDto
 import com.housebills.application.dto.sub.category.UpdateSubCategoryInDto
+import com.housebills.domain.command.sub.category.CreateSubCategoryCommand
+import com.housebills.domain.command.sub.category.DeleteSubCategoryCommand
+import com.housebills.domain.command.sub.category.UpdateSubCategoryCommand
 import com.housebills.domain.exception.sub.category.SubCategoryNotFoundException
-import com.housebills.domain.entity.SubCategory
-import com.housebills.domain.irepository.query.CategoryQueryRepository
 import com.housebills.domain.irepository.query.SubCategoryQueryRepository
 import com.housebills.domain.service.sub.category.SubCategoryCRUDService
 import org.springframework.stereotype.Service
@@ -15,18 +15,17 @@ import javax.transaction.Transactional
 @Service
 class SubCategoryFacade(
     val subCategoryQueryRepository: SubCategoryQueryRepository,
-    val categoryQueryRepository: CategoryQueryRepository,
     val subCategoryCRUDService: SubCategoryCRUDService
 ) {
 
     @Transactional
     fun createOne(createSubCategoryInDto: CreateSubCategoryInDto): SubCategoryOutDto {
-        val category =
-            categoryQueryRepository.findById(createSubCategoryInDto.categoryId)
-                .orElseThrow { CategoryNotFoundException() }
-
-        var subCategory = SubCategory(createSubCategoryInDto.name, category)
-        subCategory = subCategoryCRUDService.createOne(subCategory)
+        val subCategory = subCategoryCRUDService.createOne(
+            CreateSubCategoryCommand(
+                createSubCategoryInDto.name,
+                createSubCategoryInDto.categoryId
+            )
+        )
 
         return SubCategoryOutDto(subCategory.id, subCategory.name, subCategory.category.id)
     }
@@ -45,20 +44,13 @@ class SubCategoryFacade(
     }
 
     fun updateOne(subCategoryId: Long, updateSubCategoryInDto: UpdateSubCategoryInDto): SubCategoryOutDto {
-        var subCategory = subCategoryQueryRepository
-            .findById(subCategoryId)
-            .orElseThrow { SubCategoryNotFoundException() }
-
-        subCategory = subCategoryCRUDService.updateName(subCategory, updateSubCategoryInDto.name)
+        val subCategory =
+            subCategoryCRUDService.updateOne(UpdateSubCategoryCommand(subCategoryId, updateSubCategoryInDto.name))
 
         return SubCategoryOutDto(subCategory.id, subCategory.name, subCategory.category.id)
     }
 
     fun deleteOne(subCategoryId: Long) {
-        val subCategory = subCategoryQueryRepository
-            .findById(subCategoryId)
-            .orElseThrow { CategoryNotFoundException() }
-
-        subCategoryCRUDService.deleteOne(subCategory)
+        subCategoryCRUDService.deleteOne(DeleteSubCategoryCommand(subCategoryId))
     }
 }

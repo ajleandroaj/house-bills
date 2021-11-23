@@ -1,24 +1,44 @@
 package com.housebills.domain.service.sub.category
 
+import com.housebills.domain.command.sub.category.CreateSubCategoryCommand
+import com.housebills.domain.command.sub.category.DeleteSubCategoryCommand
+import com.housebills.domain.command.sub.category.UpdateSubCategoryCommand
 import com.housebills.domain.entity.SubCategory
+import com.housebills.domain.exception.category.CategoryNotFoundException
+import com.housebills.domain.exception.sub.category.SubCategoryNotFoundException
+import com.housebills.domain.irepository.command.CategoryCommandRepository
 import com.housebills.domain.irepository.command.SubCategoryCommandRepository
 import org.springframework.stereotype.Service
 
 @Service
 class SubCategoryCRUDService(
-    val subCategoryRepository: SubCategoryCommandRepository,
+    val subCategoryCommandRepository: SubCategoryCommandRepository,
+    val categoryCommandRepository: CategoryCommandRepository,
 ) {
 
-    fun createOne(subCategory: SubCategory): SubCategory {
-        return subCategoryRepository.save(subCategory)
+    fun createOne(createSubCategoryCommand: CreateSubCategoryCommand): SubCategory {
+        val category =
+            categoryCommandRepository.findById(createSubCategoryCommand.categoryId)
+                .orElseThrow { CategoryNotFoundException() }
+
+        val subCategory = SubCategory(createSubCategoryCommand.name, category)
+        return subCategoryCommandRepository.save(subCategory)
     }
 
-    fun updateName(subCategory: SubCategory, name: String): SubCategory {
-        subCategory.name = name
-        return subCategoryRepository.save(subCategory)
+    fun updateOne(updateSubCategoryCommand: UpdateSubCategoryCommand): SubCategory {
+        val subCategory = subCategoryCommandRepository
+            .findById(updateSubCategoryCommand.id)
+            .orElseThrow { SubCategoryNotFoundException() }
+
+        subCategory.name = updateSubCategoryCommand.name
+        return subCategoryCommandRepository.save(subCategory)
     }
 
-    fun deleteOne(subCategory: SubCategory) {
-        subCategoryRepository.delete(subCategory)
+    fun deleteOne(deleteSubCategoryCommand: DeleteSubCategoryCommand) {
+        val subCategory = subCategoryCommandRepository
+            .findById(deleteSubCategoryCommand.id)
+            .orElseThrow { SubCategoryNotFoundException() }
+
+        subCategoryCommandRepository.delete(subCategory)
     }
 }
