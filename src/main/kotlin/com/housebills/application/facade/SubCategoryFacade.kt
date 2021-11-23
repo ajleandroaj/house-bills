@@ -45,7 +45,13 @@ class SubCategoryFacade(
 
     fun updateOne(subCategoryId: Long, updateSubCategoryInDto: UpdateSubCategoryInDto): SubCategoryOutDto {
         val subCategory =
-            subCategoryCRUDService.updateOne(UpdateSubCategoryCommand(subCategoryId, updateSubCategoryInDto.name))
+            subCategoryCRUDService.updateOne(
+                UpdateSubCategoryCommand(
+                    subCategoryId,
+                    updateSubCategoryInDto.name,
+                    updateSubCategoryInDto.categoryId
+                )
+            )
 
         return SubCategoryOutDto(subCategory.id, subCategory.name, subCategory.category.id)
     }

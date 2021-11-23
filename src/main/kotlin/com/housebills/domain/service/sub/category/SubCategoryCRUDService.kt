@@ -9,6 +9,7 @@ import com.housebills.domain.exception.sub.category.SubCategoryNotFoundException
 import com.housebills.domain.irepository.command.CategoryCommandRepository
 import com.housebills.domain.irepository.command.SubCategoryCommandRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class SubCategoryCRUDService(
@@ -16,6 +17,7 @@ class SubCategoryCRUDService(
     val categoryCommandRepository: CategoryCommandRepository,
 ) {
 
+    @Transactional
     fun createOne(createSubCategoryCommand: CreateSubCategoryCommand): SubCategory {
         val category =
             categoryCommandRepository.findById(createSubCategoryCommand.categoryId)
@@ -25,15 +27,22 @@ class SubCategoryCRUDService(
         return subCategoryCommandRepository.save(subCategory)
     }
 
+    @Transactional
     fun updateOne(updateSubCategoryCommand: UpdateSubCategoryCommand): SubCategory {
         val subCategory = subCategoryCommandRepository
             .findById(updateSubCategoryCommand.id)
             .orElseThrow { SubCategoryNotFoundException() }
 
+        val category =
+            categoryCommandRepository.findById(updateSubCategoryCommand.categoryId)
+                .orElseThrow { CategoryNotFoundException() }
+
         subCategory.name = updateSubCategoryCommand.name
+        subCategory.category = category
         return subCategoryCommandRepository.save(subCategory)
     }
 
+    @Transactional
     fun deleteOne(deleteSubCategoryCommand: DeleteSubCategoryCommand) {
         val subCategory = subCategoryCommandRepository
             .findById(deleteSubCategoryCommand.id)

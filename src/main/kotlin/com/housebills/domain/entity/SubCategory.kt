@@ -19,7 +19,7 @@ class SubCategory(
     @JsonBackReference
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id")
-    val category: Category = Category()
+    var category: Category = Category()
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

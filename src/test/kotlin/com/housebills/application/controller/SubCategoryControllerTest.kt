@@ -21,15 +21,16 @@ import org.springframework.http.MediaType
 internal class SubCategoryControllerTest(@Autowired val restTemplate: TestRestTemplate) : BaseIntegrationTest() {
     val BASE_PATH = "/sub-categories"
 
-    private fun createCategory() {
+    private fun createCategories() {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         restTemplate.postForEntity<CategoryOutDto>("/categories", HttpEntity("""{"name": "Revenue"}""", headers))
+        restTemplate.postForEntity<CategoryOutDto>("/categories", HttpEntity("""{"name": "Leisure"}""", headers))
     }
 
     @BeforeAll
     internal fun beforeAll() {
-        createCategory()
+        createCategories()
     }
 
     @Test
@@ -142,10 +143,10 @@ internal class SubCategoryControllerTest(@Autowired val restTemplate: TestRestTe
         val entity = restTemplate.exchange<SubCategoryOutDto>(
             "$BASE_PATH/1",
             HttpMethod.PUT,
-            HttpEntity("""{"name": "Saves"}""", headers)
+            HttpEntity("""{"name": "Saves", "categoryId": 2}""", headers)
         )
         Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
-        Assertions.assertThat(entity.body).isEqualTo(SubCategoryOutDto(1, "Saves", 1))
+        Assertions.assertThat(entity.body).isEqualTo(SubCategoryOutDto(1, "Saves", 2))
     }
 
     @Test
