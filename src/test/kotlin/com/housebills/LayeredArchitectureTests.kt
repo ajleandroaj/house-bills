@@ -10,6 +10,11 @@ import org.springframework.stereotype.Controller
 class LayeredArchitectureTests {
 
     @ArchTest
+    val `Domain shouldn't depend on Application` =
+        noClasses().that().resideInAPackage("..domain..")
+            .should().dependOnClassesThat().resideInAPackage("..application..")
+
+    @ArchTest
     val `No one should access Controllers` =
         noClasses().should().accessClassesThat().areAnnotatedWith(Controller::class.java)
 
@@ -32,4 +37,5 @@ class LayeredArchitectureTests {
             .whereLayer("QueryRepository").mayOnlyBeAccessedByLayers("Facade")
             .whereLayer("CommandRepository").mayOnlyBeAccessedByLayers("DomainService")
             .whereLayer("DomainService").mayOnlyBeAccessedByLayers("DomainService", "Facade")
+
 }
